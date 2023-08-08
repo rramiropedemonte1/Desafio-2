@@ -1,12 +1,11 @@
 class ProductManager {
   constructor() {
     this.products = [];
+    this.id = 0;
   }
 
-  static id = 0;
-
   addProduct(title, description, price, img, code, stock) {
-    ProductManager.id++;
+    this.id++;
     this.products.push({
       title,
       description,
@@ -14,7 +13,7 @@ class ProductManager {
       img,
       code,
       stock,
-      id: ProductManager.id,
+      id: this.id,
     });
   }
 
@@ -23,38 +22,25 @@ class ProductManager {
   }
 
   getProductById(id) {
-    if (this.products.find((producto) => producto.id === id)) {
-      console.log("Si existe");
-    } else {
-      console.log("Error 404");
-    }
+    return this.products.find((producto) => producto.id === id);
   }
 
   deleteProduct(id) {
-    this.products = this.getProducts();
     const product = this.getProductById(id);
     if (!product) {
       console.error(`The product id: ${id} does not exist`);
     } else {
       this.products = this.products.filter((prod) => prod.id !== product.id);
-      this.saveProductsInJSON();
       console.log(`Product id: ${product.id} has been deleted`);
     }
   }
 
-  updateProduct(id, product) {
-    this.products = this.getProducts();
-    let position = this.products.findIndex((prod) => prod.id === id);
-
-    if (position === -1) {
+  updateProduct(id, updatedProduct) {
+    const product = this.getProductById(id);
+    if (!product) {
       console.error(`The product id: ${id} does not exist`);
     } else {
-      this.products[position].title = product.title;
-      this.products[position].description = product.description;
-      this.products[position].price = product.price;
-      this.products[position].img = product.img;
-      this.products[position].code = product.code;
-      this.products[position].stock = product.stock;
+      Object.assign(product, updatedProduct);
       console.log("Product updated!");
     }
   }
@@ -67,4 +53,20 @@ productos.addProduct("titulo2", "descripcion2", 800, "imagen2", "8907", 9);
 
 console.log(productos.getProduct());
 
-productos.getProductById(2);
+const productToUpdate = {
+  title: "New Title",
+  description: "New Description",
+  price: 1000,
+  img: "new-image",
+  code: "new-code",
+  stock: 10,
+};
+productos.updateProduct(1, productToUpdate);
+
+console.log(productos.getProduct());
+
+productos.deleteProduct(2);
+
+console.log(productos.getProduct());
+
+module.exports = ProductManager;
